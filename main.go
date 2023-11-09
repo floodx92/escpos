@@ -2,11 +2,15 @@ package escpos
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
-	"github.com/qiniu/iconv"
 	"image"
 	"io"
 	"math"
+
+	"github.com/qiniu/iconv"
+	"golang.org/x/text/encoding/charmap"
+	"golang.org/x/text/transform"
 )
 
 type Style struct {
@@ -140,7 +144,23 @@ func (e *Escpos) Write(data string) (int, error) {
 		return 0, err
 	}
 
-	return e.WriteRaw([]byte(data))
+	//convert data to iso-8859-1
+	iso8859_1_buf := new(bytes.Buffer)
+    encoder := charmap.ISO8859_1.NewEncoder()
+    transformer := transform.NewWriter(iso8859_1_buf, encoder)
+    _, err = transformer.Write([]byte(data))
+    if err != nil {
+        return 0, err
+    }
+    err = transformer.Close()
+    if err != nil {
+        return 0, err
+    }
+
+    // ISO-8859-1 encoded string
+    iso8859_1_string := iso8859_1_buf.String()
+
+	return e.WriteRaw([]byte(iso8859_1_string))
 }
 
 // WriteGBK writes a string to the printer using GBK encoding
