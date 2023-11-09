@@ -8,7 +8,6 @@ import (
 	"io"
 	"math"
 
-	"github.com/qiniu/iconv"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
 )
@@ -146,7 +145,7 @@ func (e *Escpos) Write(data string) (int, error) {
 
 	//convert data to iso-8859-1
 	iso8859_1_buf := new(bytes.Buffer)
-    encoder := charmap.ISO8859_1.NewEncoder()
+    encoder := charmap.CodePage852.NewEncoder()
     transformer := transform.NewWriter(iso8859_1_buf, encoder)
     _, err = transformer.Write([]byte(data))
     if err != nil {
@@ -160,62 +159,10 @@ func (e *Escpos) Write(data string) (int, error) {
     // ISO-8859-1 encoded string
     iso8859_1_string := iso8859_1_buf.String()
 
+	//print out the bytes
+	fmt.Printf("%v", []byte(iso8859_1_string))
+
 	return e.WriteRaw([]byte(iso8859_1_string))
-}
-
-// WriteGBK writes a string to the printer using GBK encoding
-func (e *Escpos) WriteGBK(data string) (int, error) {
-	cd, err := iconv.Open("gbk", "utf-8")
-	if err != nil {
-		return 0, err
-	}
-	defer cd.Close()
-	gbk := cd.ConvString(data)
-	return e.Write(gbk)
-}
-
-// WriteWEU writes a string to the printer using Western European encoding
-func (e *Escpos) WriteWEU(data string) (int, error) {
-	cd, err := iconv.Open("cp850", "utf-8")
-	if err != nil {
-		return 0, err
-	}
-	defer cd.Close()
-	weu := cd.ConvString(data)
-	return e.Write(weu)
-}
-
-//WriteLatin2 writes a string to the printer using Latin2 encoding
-func (e *Escpos) WriteLatin2(data string) (int, error) {
-	cd, err := iconv.Open("cp852", "utf-8")
-	if err != nil {
-		return 0, err
-	}
-	defer cd.Close()
-	l2 := cd.ConvString(data)
-	return e.Write(l2)
-}
-
-//WriteWindows1250 writes a string to the printer using Windows1250 encoding
-func (e *Escpos) WriteWindows1250(data string) (int, error) {
-	cd, err := iconv.Open("Windows-1250", "utf-8")
-	if err != nil {
-		return 0, err
-	}
-	defer cd.Close()
-	l2 := cd.ConvString(data)
-	return e.Write(l2)
-}
-
-//Write iso-8859-2 writes a string to the printer using iso-8859-2 encoding
-func (e *Escpos) WriteISO88592(data string) (int, error) {
-	cd, err := iconv.Open("iso-8859-2", "utf-8")
-	if err != nil {
-		return 0, err
-	}
-	defer cd.Close()
-	l2 := cd.ConvString(data)
-	return e.Write(l2)
 }
 
 // Sets the printer to print Bold text.
