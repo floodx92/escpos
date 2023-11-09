@@ -165,6 +165,39 @@ func (e *Escpos) WriteWEU(data string) (int, error) {
 	return e.Write(weu)
 }
 
+//WriteLatin2 writes a string to the printer using Latin2 encoding
+func (e *Escpos) WriteLatin2(data string) (int, error) {
+	cd, err := iconv.Open("cp852", "utf-8")
+	if err != nil {
+		return 0, err
+	}
+	defer cd.Close()
+	l2 := cd.ConvString(data)
+	return e.Write(l2)
+}
+
+//WriteWindows1250 writes a string to the printer using Windows1250 encoding
+func (e *Escpos) WriteWindows1250(data string) (int, error) {
+	cd, err := iconv.Open("Windows-1250", "utf-8")
+	if err != nil {
+		return 0, err
+	}
+	defer cd.Close()
+	l2 := cd.ConvString(data)
+	return e.Write(l2)
+}
+
+//Write iso-8859-2 writes a string to the printer using iso-8859-2 encoding
+func (e *Escpos) WriteISO88592(data string) (int, error) {
+	cd, err := iconv.Open("iso-8859-2", "utf-8")
+	if err != nil {
+		return 0, err
+	}
+	defer cd.Close()
+	l2 := cd.ConvString(data)
+	return e.Write(l2)
+}
+
 // Sets the printer to print Bold text.
 func (e *Escpos) Bold(p bool) *Escpos {
 	e.Style.Bold = p
