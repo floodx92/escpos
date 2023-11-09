@@ -159,9 +159,6 @@ func (e *Escpos) Write(data string) (int, error) {
     // ISO-8859-1 encoded string
     iso8859_1_string := iso8859_1_buf.String()
 
-	//print out the bytes
-	fmt.Printf("%v", []byte(iso8859_1_string))
-
 	return e.WriteRaw([]byte(iso8859_1_string))
 }
 
